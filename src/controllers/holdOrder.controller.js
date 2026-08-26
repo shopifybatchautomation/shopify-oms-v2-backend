@@ -1,5 +1,7 @@
 const { HoldOrder } = require('../models/holdOrder.model');
 const ConfirmOrder = require('../models/confirmOrder.model');
+const ProcessedOrder = require('../models/processedOrder.model');
+
 const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
@@ -65,7 +67,46 @@ const moveHoldOrdersToConfirmed = asyncHandler(async (req, res) => {
   const successCount = results.filter((r) => r.success).length;
   res
     .status(200)
-    .json(new ApiResponse(200, `${successCount} of ${ids.length} orders moved to confirmed.`, results));
+    .json(
+      new ApiResponse(200, `${successCount} of ${ids.length} orders moved to confirmed.`, results)
+    );
 });
 
-module.exports = { getHoldOrders, createHoldOrdersBulk, moveHoldOrdersToConfirmed };
+// POST /api/v1/orders/hold/move-to-processed {ids:[]}
+
+const moveHoldOrdersToProccessed = asyncHandler(async (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    throw new ApiError(400, 'Request body must contain an array of ids.');
+  }
+
+  const results = [];
+  for (const id of ids) {
+    try {
+      const { redirected, order_id } = await moveOrderById(
+        HoldOrder,
+        ProcessedOrder,
+        id,
+        { order_status: 'Hold order processed' },
+        'processed'
+      );
+      results.push({ id, order_id, success: true, redirected });
+    } catch (error) {
+      results.push({ id, success: false, error: error.message });
+    }
+  }
+
+  const successCount = results.filter((r) => r.success).length;
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, `${successCount} of ${ids.length} orders moved to processed.`, results)
+    );
+});
+
+module.exports = {
+  getHoldOrders,
+  createHoldOrdersBulk,
+  moveHoldOrdersToConfirmed,
+  moveHoldOrdersToProccessed,
+};
