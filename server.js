@@ -37,6 +37,7 @@ app.use(
       'http://localhost:5173',
       'https://shopifyomsv2.netlify.app',
       'https://shopifyomsv3.netlify.app',
+      'https://shopifyomsv4.netlify.app',
     ],
   })
 );
