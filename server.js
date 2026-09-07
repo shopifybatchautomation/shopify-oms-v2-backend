@@ -13,6 +13,7 @@ const pressTableRoutes = require('./src/routes/pressTable.route');
 const shipReturnRoutes = require('./src/routes/shipReturn.route');
 const inventoryTableRoutes = require('./src/routes/inventoryTable.route');
 const returnLogRoutes = require('./src/routes/returnLog.routes');
+const productRoutes = require('./src/routes/productRoutes.js');
 
 // -- Order management module (rewritten) --
 const confirmOrderRoutes = require('./src/routes/confirmOrder.routes');
@@ -38,6 +39,7 @@ app.use(
       'https://shopifyomsv2.netlify.app',
       'https://shopifyomsv3.netlify.app',
       'https://shopifyomsv4.netlify.app',
+      'https://product-finder.netlify.app',
     ],
   })
 );
@@ -48,6 +50,7 @@ app.use('/api/v1/press-table', pressTableRoutes);
 app.use('/api/v1/ship-record', shipReturnRoutes);
 app.use('/api/v1/inventory-table', inventoryTableRoutes);
 app.use('/api/v1/return-log', returnLogRoutes);
+app.use('/api/v1/products', productRoutes);
 
 // routes for order management
 app.use('/api/v1/orders', confirmOrderRoutes);
