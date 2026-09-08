@@ -40,6 +40,7 @@ app.use(
       'https://shopifyomsv3.netlify.app',
       'https://shopifyomsv4.netlify.app',
       'https://product-finder.netlify.app',
+      'https://p-finder.netlify.app'
     ],
   })
 );
