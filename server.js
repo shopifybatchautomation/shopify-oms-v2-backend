@@ -40,6 +40,7 @@ app.use(
       'https://shopifyomsv2.netlify.app',
       'https://shopifyomsv3.netlify.app',
       'https://shopifyomsv4.netlify.app',
+      'https://qurvii-order-dashboard.netlify.app',
       'https://p-finder.netlify.app',
     ],
   })
