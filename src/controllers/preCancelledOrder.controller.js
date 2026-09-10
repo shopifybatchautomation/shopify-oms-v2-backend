@@ -95,9 +95,81 @@ const restorePreCancelledOrder = asyncHandler(async (req, res) => {
     );
 });
 
+// AGGREGATION PIPELINE
+const getPrecancelledOrderByDateRange = asyncHandler(async (req, res) => {
+  const { startDate, endDate } = req.body;
+  if (!startDate || !endDate) {
+    throw new ApiError(400, 'startDate and endDate are required');
+  }
+  //  Convert to Date objects
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (isNaN(start) || isNaN(end)) {
+    throw new ApiError(400, 'Invalid date format');
+  }
+
+  if (start > end) {
+    throw new ApiError(400, 'startDate must be before endDate');
+  }
+
+  // Make end date inclusive (end of day)
+  end.setHours(23, 59, 59, 999);
+
+  const result = await PreCancelledOrder.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: start, $lte: end },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        //  ifNull handles missing quantity
+        preCancelledCount: { $sum: { $ifNull: ['$quantity', 0] } },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        date_range: {
+          $concat: [
+            {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: start,
+                timezone: 'Asia/Kolkata',
+              },
+            },
+            ' to ',
+            {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: end,
+                timezone: 'Asia/Kolkata',
+              },
+            },
+          ],
+        },
+        preCancelledCount: 1,
+      },
+    },
+  ]);
+
+  //  Handle empty result (no orders in range)
+  const data = result[0] || {
+    date_range: `${startDate} to ${endDate}`,
+    preCancelledCount: 0,
+  };
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, `Precancelled orders fetched for ${startDate} to ${endDate}`, data));
+});
+
 module.exports = {
   getPreCancelledOrders,
   createPreCancelledOrdersBulk,
   finalizePreCancelledOrder,
   restorePreCancelledOrder,
+  getPrecancelledOrderByDateRange,
 };

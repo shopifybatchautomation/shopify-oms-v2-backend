@@ -26,6 +26,7 @@ const blacklistedOrderRoutes = require('./src/routes/blacklistedOrder.routes');
 const blacklistedCustomerRoutes = require('./src/routes/blacklistedCustomer.routes');
 const dashboardRoutes = require('./src/routes/dashboard.routes');
 const processedOrdersRoutes = require('./src/routes/processedOrder.routes');
+const orderStatsRoutes = require('./src/routes/orderStats.routes.js');
 
 const PORT = process.env.PORT || 5000;
 
@@ -39,8 +40,7 @@ app.use(
       'https://shopifyomsv2.netlify.app',
       'https://shopifyomsv3.netlify.app',
       'https://shopifyomsv4.netlify.app',
-      'https://product-finder.netlify.app',
-      'https://p-finder.netlify.app'
+      'https://p-finder.netlify.app',
     ],
   })
 );
@@ -64,6 +64,7 @@ app.use('/api/v1/orders', processedOrdersRoutes);
 app.use('/api/v1/orders', blacklistedOrderRoutes);
 app.use('/api/v1/customers', blacklistedCustomerRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/orders', orderStatsRoutes);
 
 // mongodb connection
 connectDB()
