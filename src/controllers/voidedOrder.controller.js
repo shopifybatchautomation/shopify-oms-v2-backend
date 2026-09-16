@@ -7,34 +7,6 @@ const { BlackListedCustomer } = require('../models/blacklisted_customer.model');
 const mongoose = require('mongoose');
 const CancelOrder = require('../models/cancelOrder.model.js');
 
-// GET /api/v1/orders/voided
-// const getVoidedOrders = asyncHandler(async (req, res) => {
-//   const { records, pagination } = await listOrders(VoidedOrder, req.query, [
-//     'order_id',
-//     'size',
-//     'shipping_method',
-//     'payment_status',
-//   ]);
-//   res
-//     .status(200)
-//     .json(new ApiResponse(200, 'Voided orders fetched successfully.', { records, pagination }));
-// });
-
-// const getVoidedOrders = asyncHandler(async (req, res) => {
-//   // Process using aggregation pipeline
-//   await autoMoveBlacklistedOrders();
-
-//   const { records, pagination } = await listOrders(VoidedOrder, req.query, [
-//     'order_id',
-//     'size',
-//     'shipping_method',
-//     'payment_status',
-//   ]);
-
-//   res
-//     .status(200)
-//     .json(new ApiResponse(200, 'Voided orders fetched successfully.', { records, pagination }));
-// });
 const getVoidedOrders = asyncHandler(async (req, res) => {
   // Process blacklisted orders
   try {

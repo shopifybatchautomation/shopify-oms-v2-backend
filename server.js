@@ -28,6 +28,10 @@ const dashboardRoutes = require('./src/routes/dashboard.routes');
 const processedOrdersRoutes = require('./src/routes/processedOrder.routes');
 const orderStatsRoutes = require('./src/routes/orderStats.routes.js');
 
+// shopify admin api routes
+const paymentPendingRoutes = require('./src/routes/payment_pending.routes.js');
+const refundedOrders = require('./src/routes/refunded_orders.routes.js');
+
 const PORT = process.env.PORT || 5000;
 
 // global middlewares
@@ -65,6 +69,10 @@ app.use('/api/v1/orders', blacklistedOrderRoutes);
 app.use('/api/v1/customers', blacklistedCustomerRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/orders', orderStatsRoutes);
+
+// shopify admin api routes
+app.use('/api/v1/orders', paymentPendingRoutes);
+app.use('/api/v1/refund-orders', refundedOrders);
 
 // mongodb connection
 connectDB()
