@@ -3,7 +3,7 @@ const getAccessToken = require('../utils/shopifyTokenGenerate');
 async function testOrdersAccess() {
   const token = process.env.ACCESS_TOKEN;
   const fromDate = new Date();
-  fromDate.setDate(fromDate.getDate() - 90);
+  fromDate.setDate(fromDate.getDate() - 30);
   const fromDateISO = fromDate.toISOString().split('T')[0];
 
   let allOrders = [];
@@ -24,7 +24,7 @@ async function testOrdersAccess() {
         body: JSON.stringify({
           query: `
             {
-              orders(first: 250, sortKey: CREATED_AT, reverse: true, query: "financial_status:paid,expired AND fulfillment_status:unfulfilled AND created_at:>=${fromDateISO}"${afterClause}) {
+              orders(first: 250, sortKey: CREATED_AT, reverse: true, query: "financial_status:paid,expired,pending AND fulfillment_status:unfulfilled AND created_at:>=${fromDateISO}"${afterClause}) {
                 pageInfo {
                   hasNextPage
                   endCursor
@@ -82,7 +82,14 @@ async function testOrdersAccess() {
     }
   }
 
-  const pendingOrders = allOrders.filter((o) => o.transactions.some((p) => p.status === 'PENDING'));
+  // const pendingOrders = allOrders.filter((o) => o.transactions.some((p) => p.status === 'PENDING'));
+  const pendingOrders = allOrders.filter((o) =>
+    o.paymentGatewayNames.some(
+      (p) =>
+        p?.toLowerCase() === 'cashfree payments' &&
+        o.transactions.some((t) => t.kind === 'SALE' && t.status === 'PENDING')
+    )
+  );
   console.log('Total orders fetched:', pendingOrders.length);
   return pendingOrders;
 }

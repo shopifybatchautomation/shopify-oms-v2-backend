@@ -7,6 +7,10 @@ const paymentPendingSchema = buildOrderSchema({
     trim: true,
     default: 'Order is prepaid but payment is pending ',
   },
+  customer_contacted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const PaymentPending = mongoose.model('PaymentPending', paymentPendingSchema);

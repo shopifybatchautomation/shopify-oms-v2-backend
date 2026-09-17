@@ -32,7 +32,9 @@ const normalizeOrderPayload = (raw) => {
     price: Number(raw.price) || 0,
     order_date: parseToDate(raw.order_date),
     customer_id: raw.customer_id ? Number(raw.customer_id) : undefined,
-    customer_email: raw.customer_email ? String(raw.customer_email).toLowerCase().trim() : undefined,
+    customer_email: raw.customer_email
+      ? String(raw.customer_email).toLowerCase().trim()
+      : undefined,
     payment_type: raw.payment_type === 'Prepaid' ? 'Prepaid' : 'COD',
   };
 
@@ -46,9 +48,17 @@ const normalizeOrderPayload = (raw) => {
 /**
  * Paginated list for any order-status resource.
  */
-const listOrders = (Model, query, searchFields = DEFAULT_SEARCH_FIELDS) => {
+const listOrders = (Model, query, searchFields = DEFAULT_SEARCH_FIELDS, extraFilter = {}) => {
   const { page, limit, search, startDate, endDate } = query;
-  return paginateQuery(Model, { page, limit, search, searchFields, startDate, endDate });
+  return paginateQuery(Model, {
+    page,
+    limit,
+    search,
+    searchFields,
+    startDate,
+    endDate,
+    extraFilter,
+  });
 };
 
 /**

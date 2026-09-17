@@ -1,5 +1,6 @@
+const mongoose = require('mongoose');
 const PaymentPending = require('../models/payment_pending.model');
-const { createOrdersBulk } = require('../services/order.service');
+const { createOrdersBulk, listOrders } = require('../services/order.service');
 const {
   testOrdersAccess,
   refundFailedOrders,
@@ -78,9 +79,48 @@ const salesSummary = asyncHandler(async (req, res) => {
   );
 });
 
+// get payment pending orders
+const getPaymentPendingOrders = asyncHandler(async (req, res) => {
+  const result = await listOrders(PaymentPending, req.query, [], {
+    customer_contacted: false,
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, 'Payment pending orders fetched successfully.', result));
+});
+
+// update customer caontacked
+const updateCustomerContacted = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  //  Proper validation
+  if (!id || !mongoose.isValidObjectId(id)) {
+    throw new ApiError(400, 'Order id must be valid');
+  }
+
+  const record = await PaymentPending.findById(id);
+  if (!record) throw new ApiError(404, 'Order not found');
+
+  record.customer_contacted = !record.customer_contacted;
+  await record.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        `${record.order_id} is ${record.customer_contacted ? 'marked as contacted' : 'unmarked'}`,
+        record
+      )
+    );
+});
+
 module.exports = {
   fetchPaymentPendingOrders,
   fetchRefundFailedOrders,
   createPaymentPendingOrders,
   salesSummary,
+  getPaymentPendingOrders,
+  updateCustomerContacted,
 };
