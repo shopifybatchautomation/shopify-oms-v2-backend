@@ -6,6 +6,7 @@ const {
   salesSummary,
   getPaymentPendingOrders,
   updateCustomerContacted,
+  createPaymentPendingToConfirmedOrdersBulk,
 } = require('../controllers/payment_pending.controller');
 const router = Router();
 const helperRoute = '/payment-pending';
@@ -14,6 +15,7 @@ router.get(helperRoute, fetchPaymentPendingOrders);
 router.get(`${helperRoute}-orders`, getPaymentPendingOrders);
 router.patch(`${helperRoute}/:id`, updateCustomerContacted);
 router.post(`${helperRoute}/create/bulk`, createPaymentPendingOrders);
+router.post(`${helperRoute}-confirm`, createPaymentPendingToConfirmedOrdersBulk);
 
 router.post('/sales', salesSummary);
 router.get('/refund-failed', fetchRefundFailedOrders);

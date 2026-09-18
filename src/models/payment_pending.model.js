@@ -11,6 +11,10 @@ const paymentPendingSchema = buildOrderSchema({
     type: Boolean,
     default: false,
   },
+  customer_cancelled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const PaymentPending = mongoose.model('PaymentPending', paymentPendingSchema);

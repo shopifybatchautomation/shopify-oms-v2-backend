@@ -10,6 +10,7 @@ const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const summarizeOrdersReport = require('../utils/summarizeReturnOrders');
+const ConfirmOrder = require('../models/confirmOrder.model');
 
 // payment failed or pending orders
 const fetchPaymentPendingOrders = async (req, res) => {
@@ -103,6 +104,7 @@ const updateCustomerContacted = asyncHandler(async (req, res) => {
   if (!record) throw new ApiError(404, 'Order not found');
 
   record.customer_contacted = !record.customer_contacted;
+  record.customer_cancelled = true;
   await record.save();
 
   return res
@@ -116,6 +118,38 @@ const updateCustomerContacted = asyncHandler(async (req, res) => {
     );
 });
 
+// payment pending move to confirm
+const createPaymentPendingToConfirmedOrdersBulk = asyncHandler(async (req, res) => {
+  const { orders, status } = req.body;
+  const orderIds = orders.map((o) => o._id);
+
+  // Run bulk insert and bulk status update in parallel
+  const [bulkResult, deletedFromPaymentPendingOrders] = await Promise.all([
+    createOrdersBulk(ConfirmOrder, orders, 'confirmed'),
+    PaymentPending.deleteMany({ _id: { $in: orderIds } }),
+  ]);
+
+  const { inserted, blacklistedCount } = bulkResult;
+
+  // Single bulk update for all confirmed orders instead of per-id updates
+  if (inserted.length && status) {
+    await ConfirmOrder.updateMany(
+      { _id: { $in: inserted.map((o) => o._id) } },
+      { $set: { payment_type: status } }
+    );
+  }
+
+  res
+    .status(201)
+    .json(
+      new ApiResponse(
+        201,
+        `${inserted.length} order(s) confirmed. ${blacklistedCount} redirected to blacklisted orders.`,
+        { inserted, blacklistedCount }
+      )
+    );
+});
+
 module.exports = {
   fetchPaymentPendingOrders,
   fetchRefundFailedOrders,
@@ -123,4 +157,5 @@ module.exports = {
   salesSummary,
   getPaymentPendingOrders,
   updateCustomerContacted,
+  createPaymentPendingToConfirmedOrdersBulk,
 };
