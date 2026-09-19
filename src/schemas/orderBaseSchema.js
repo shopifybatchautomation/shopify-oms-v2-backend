@@ -67,7 +67,7 @@ const buildOrderSchema = (extra = {}, schemaOptions = {}) => {
       // Normalised bucket used by the dashboard's COD vs Prepaid breakdown.
       payment_type: {
         type: String,
-        enum: ['COD', 'Prepaid'],
+        enum: ['COD', 'Prepaid', 'COD Confirmed', 'Prepaid Confirmed'],
         required: true,
         default: 'COD',
       },
