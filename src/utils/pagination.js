@@ -38,14 +38,15 @@ const paginateQuery = async (
 
   if (startDate || endDate) {
     const { start, end } = buildDateRange(startDate, endDate);
-    filter.order_date = { $gte: start, $lte: end };
+    // filter.order_date = { $gte: start, $lte: end };
+    filter.createdAt = { $gte: start, $lte: end };
   }
 
   const totalRecords = await Model.countDocuments(filter);
   const totalPages = Math.max(1, Math.ceil(totalRecords / limitNum));
 
   const records = await Model.find(filter)
-    .sort({ order_date: -1, createdAt: -1 })
+    .sort({ createdAt: -1 })
     .skip((pageNum - 1) * limitNum)
     .limit(limitNum);
 
