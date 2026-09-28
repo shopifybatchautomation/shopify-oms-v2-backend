@@ -33,12 +33,13 @@ const createProcessedOrder = asyncHandler(async (req, res) => {
   if (confirmedOrders.length === 0) {
     return res.status(404).json(new ApiResponse(404, 'No confirmed orders found to process.'));
   }
-
+  const processedAt = new Date();
   // Step 2: Prepare processed orders data
   const processedOrdersData = confirmedOrders.map((order) => ({
     ...order.toObject(),
+    createdAt: processedAt,
     processed_by: req.user?.email || 'system', // Track who processed
-    processed_at: new Date(),
+    processed_at: processedAt,
     // Remove _id and __v so they get new ones
     _id: undefined,
     __v: undefined,
