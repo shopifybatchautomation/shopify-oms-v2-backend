@@ -93,7 +93,7 @@ async function testOrdersAccess() {
   console.log('Total orders fetched:', pendingOrders.length);
   return pendingOrders;
 }
-
+// REFUND FAILED ORDERS
 async function refundFailedOrders(DAYS) {
   const token = process.env.ACCESS_TOKEN;
   const fromDate = new Date();
@@ -118,7 +118,7 @@ async function refundFailedOrders(DAYS) {
         body: JSON.stringify({
           query: `
             {
-              orders(first: 250, sortKey: CREATED_AT, reverse: true, query: "fulfillment_status:fulfilled AND created_at:>=${fromDateISO}"${afterClause}) {
+              orders(first: 250, sortKey: UPDATED_AT, reverse: true, query: "fulfillment_status:fulfilled AND updated_at:>=${fromDateISO}"${afterClause}) {
                 pageInfo {
                   hasNextPage
                   endCursor
@@ -142,6 +142,10 @@ async function refundFailedOrders(DAYS) {
                       phone
                     }
                     transactions(first: 10) {
+                      id
+                      createdAt
+                      processedAt
+                      errorCode
                       kind
                       status
                       gateway
@@ -181,8 +185,14 @@ async function refundFailedOrders(DAYS) {
 
   console.log('Total orders fetched:', allOrders.length);
 
+  // Sirf wahi orders jinka REFUND ERROR transaction last DAYS din ke andar hua
+  const fromTime = new Date(fromDateISO).getTime();
+
   const refundErrorOrders = allOrders.filter((order) =>
-    order.transactions.some((txn) => txn.kind === 'REFUND' && txn.status === 'ERROR')
+    order.transactions.some((txn) => {
+      const txnDate = new Date(txn.processedAt || txn.createdAt).getTime();
+      return txn.kind === 'REFUND' && txn.status === 'ERROR' && txnDate >= fromTime;
+    })
   );
 
   return refundErrorOrders;
