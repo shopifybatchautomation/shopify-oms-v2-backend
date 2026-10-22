@@ -45,6 +45,7 @@ app.use(
       'https://shopifyomsv3.netlify.app',
       'https://shopifyomsv4.netlify.app',
       'https://p-finder.netlify.app',
+      'https://out-of-stock-product.netlify.app/'
     ],
   })
 );
