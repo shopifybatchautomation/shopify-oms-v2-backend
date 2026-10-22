@@ -5,6 +5,7 @@ const {
   testOrdersAccess,
   refundFailedOrders,
   fetchOrdersForSummary,
+  fetchOutOfStocksStyle,
 } = require('../services/paymentPending.service');
 const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
@@ -150,11 +151,24 @@ const createPaymentPendingToConfirmedOrdersBulk = asyncHandler(async (req, res) 
     );
 });
 
+// get out of stocks product
+const getOutOfStocksProduct = asyncHandler(async (req, res) => {
+  const data = await fetchOutOfStocksStyle();
+  console.log(req.ip);
+  res.status(200).json(
+    new ApiResponse(200, 'Out of stocks product fetched', {
+      total: data.length,
+      data,
+    })
+  );
+});
+
 module.exports = {
   fetchPaymentPendingOrders,
   fetchRefundFailedOrders,
   createPaymentPendingOrders,
   salesSummary,
+  getOutOfStocksProduct,
   getPaymentPendingOrders,
   updateCustomerContacted,
   createPaymentPendingToConfirmedOrdersBulk,
