@@ -93,7 +93,7 @@ async function testOrdersAccess() {
   console.log('Total orders fetched:', pendingOrders.length);
   return pendingOrders;
 }
-// REFUND FAILED ORDERS
+
 async function refundFailedOrders(DAYS) {
   const token = process.env.ACCESS_TOKEN;
   const fromDate = new Date();
@@ -197,8 +197,6 @@ async function refundFailedOrders(DAYS) {
 
   return refundErrorOrders;
 }
-
-// return orders
 async function fetchOrdersForSummary(fromDateInput, toDateInput) {
   const token = process.env.ACCESS_TOKEN;
 
@@ -357,4 +355,97 @@ async function fetchOrdersForSummary(fromDateInput, toDateInput) {
   console.log('Total orders fetched:', allOrders.length);
   return allOrders;
 }
-module.exports = { testOrdersAccess, refundFailedOrders, fetchOrdersForSummary };
+
+async function fetchOutOfStocksStyle() {
+  const token = process.env.ACCESS_TOKEN;
+
+  let products = [];
+  let hasNextPage = true;
+  let cursor = null;
+
+  while (hasNextPage) {
+    const afterClause = cursor ? `, after: "${cursor}"` : '';
+
+    const response = await fetch(
+      'https://qurvii-india.myshopify.com/admin/api/2025-07/graphql.json',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': token,
+        },
+        body: JSON.stringify({
+          query: `
+            {
+              products(first: 250, sortKey: UPDATED_AT, reverse: true, query: "tag:'Out of stock'"${afterClause}) {
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                }
+                edges {
+                  node {
+                    id
+                    title
+                    handle
+                    status
+                    tags
+                    totalInventory
+                    updatedAt
+                    featuredImage {
+                    url
+                    altText
+                    }
+                    variants(first: 50) {
+                      edges {
+                        node {
+                          id
+                          sku
+                          title
+                          inventoryQuantity
+                          image{
+                          url
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          `,
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (result.errors) {
+      console.error('GraphQL Errors:', JSON.stringify(result.errors, null, 2));
+      break;
+    }
+
+    const productData = result.data.products;
+
+    // is page ke products ko purani list me jodo
+    const newProducts = productData.edges.map((edge) => edge.node);
+    products = products.concat(newProducts);
+
+    hasNextPage = productData.pageInfo.hasNextPage;
+    cursor = productData.pageInfo.endCursor;
+
+    if (hasNextPage) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+
+  console.log('Total out of stock products fetched:', products.length);
+
+  return products;
+}
+
+module.exports = {
+  testOrdersAccess,
+  refundFailedOrders,
+  fetchOrdersForSummary,
+  fetchOutOfStocksStyle,
+};
