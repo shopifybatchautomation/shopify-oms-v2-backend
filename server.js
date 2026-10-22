@@ -37,32 +37,21 @@ const PORT = process.env.PORT || 5000;
 // global middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const origin = [
+
+app.use(
+  cors({
+    origin: [
       'http://localhost:5173',
       'https://shopifyomsv2.netlify.app',
       'https://shopifyomsv3.netlify.app',
       'https://shopifyomsv4.netlify.app',
       'https://p-finder.netlify.app',
-      'https://out-of-stock-product.netlify.app/'
+      'https://out-of-stock-product.netlify.app'
     ],
-// app.use(
-//   cors({
-//     origin: [
-//       'http://localhost:5173',
-//       'https://shopifyomsv2.netlify.app',
-//       'https://shopifyomsv3.netlify.app',
-//       'https://shopifyomsv4.netlify.app',
-//       'https://p-finder.netlify.app',
-//       'https://out-of-stock-product.netlify.app/'
-//     ],
-//   })
-// );
-  app.use(
-  cors({
-    origin
   })
 );
-console.log(origin)
+console.log("test console")
+
 
 // routes for return & inventory management
 app.use('/api/v1/return-table', returnTableRoutes);
