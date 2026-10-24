@@ -27,6 +27,7 @@ const normalizePendingReason = (value) => {
 const normalizeOrderPayload = (raw) => {
   const normalized = {
     ...raw,
+
     styleNumber: Number(raw.styleNumber) || 0,
     quantity: Number(raw.quantity) || 0,
     price: Number(raw.price) || 0,

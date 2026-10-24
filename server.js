@@ -31,27 +31,26 @@ const orderStatsRoutes = require('./src/routes/orderStats.routes.js');
 // shopify admin api routes
 const paymentPendingRoutes = require('./src/routes/payment_pending.routes.js');
 const refundedOrders = require('./src/routes/refunded_orders.routes.js');
+const shopifyProductsRoutes = require('./src/routes/shopify_products.routes.js');
 
 const PORT = process.env.PORT || 5000;
 
 // global middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(
   cors({
     origin: [
       'http://localhost:5173',
+      'http://localhost:5174',
       'https://shopifyomsv2.netlify.app',
       'https://shopifyomsv3.netlify.app',
       'https://shopifyomsv4.netlify.app',
       'https://p-finder.netlify.app',
-      'https://out-of-stock-product.netlify.app'
+      'https://out-of-stock-product.netlify.app',
     ],
   })
 );
-console.log("test console")
-
 
 // routes for return & inventory management
 app.use('/api/v1/return-table', returnTableRoutes);
@@ -77,6 +76,7 @@ app.use('/api/v1/orders', orderStatsRoutes);
 // shopify admin api routes
 app.use('/api/v1/orders', paymentPendingRoutes);
 app.use('/api/v1/refund-orders', refundedOrders);
+app.use('/api/v1/shopify-products', shopifyProductsRoutes);
 
 // mongodb connection
 connectDB()
