@@ -39,6 +39,16 @@ const PRODUCT_FIELDS = `
     url
     altText
   }
+  priceRangeV2 {
+    minVariantPrice {
+      amount
+      currencyCode
+    }
+    maxVariantPrice {
+      amount
+      currencyCode
+    }
+  }
   variants(first: 50) {
     edges {
       node {
@@ -46,6 +56,8 @@ const PRODUCT_FIELDS = `
         sku
         title
         inventoryQuantity
+        price
+        compareAtPrice
         image {
           url
         }
