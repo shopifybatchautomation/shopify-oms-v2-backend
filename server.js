@@ -33,10 +33,14 @@ const paymentPendingRoutes = require('./src/routes/payment_pending.routes.js');
 const refundedOrders = require('./src/routes/refunded_orders.routes.js');
 const shopifyProductsRoutes = require('./src/routes/shopify_products.routes.js');
 
+// sales routes
+const salesRoutes = require('./src/routes/sales/sales.routes.js');
+const rackSpaceRoutes = require('./src/routes/rackSpace/rackSpace.routes.js');
+
 const PORT = process.env.PORT || 5000;
 
 // global middlewares
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
@@ -77,6 +81,10 @@ app.use('/api/v1/orders', orderStatsRoutes);
 app.use('/api/v1/orders', paymentPendingRoutes);
 app.use('/api/v1/refund-orders', refundedOrders);
 app.use('/api/v1/shopify-products', shopifyProductsRoutes);
+
+// sales routes
+app.use('/api/v1/sales', salesRoutes);
+app.use('/api/v1/rack-space', rackSpaceRoutes);
 
 // mongodb connection
 connectDB()

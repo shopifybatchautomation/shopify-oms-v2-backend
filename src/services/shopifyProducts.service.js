@@ -49,6 +49,7 @@ const PRODUCT_FIELDS = `
       currencyCode
     }
   }
+
   variants(first: 50) {
     edges {
       node {
@@ -123,7 +124,6 @@ async function fetchProductsPage({
   };
 }
 
-// Count + page parallel me. Count sirf pehli request (cursor null) pe aata hai.
 async function getProducts(config, cursor = null, limit = DEFAULT_LIMIT) {
   const [total, page] = await Promise.all([
     cursor ? Promise.resolve(null) : fetchProductsCount(config.searchQuery),
